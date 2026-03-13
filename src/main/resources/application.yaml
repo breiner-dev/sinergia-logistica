@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: logistica
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/logistica
+    username: postgres
+    password: postgres
+
+  sql:
+    init:
+      mode: always
+
+  #r2dbc:
+  #  url: r2dbc:postgresql://localhost:5432/logistics_db
+  #  username: postgres
+  #  password: postgres
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  server:
+    port: 8080
+
+  jackson:
+    time-zone: America/Bogota
+
+server:
+  port: 8080
+
+app:
+  rabbit:
+    exchange: envios.exchange
+    queue: envios.queue
+    routing-key: envio.creado
