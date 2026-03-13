@@ -3,24 +3,19 @@ spring:
     name: logistica
 
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/logistica
-    username: postgres
-    password: postgres
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/logistics_db}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
 
   sql:
     init:
       mode: always
 
-  #r2dbc:
-  #  url: r2dbc:postgresql://localhost:5432/logistics_db
-  #  username: postgres
-  #  password: postgres
-
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
 
   server:
     port: 8080
@@ -32,6 +27,9 @@ server:
   port: 8080
 
 app:
+  jwt:
+    secret: 1234567890123456789012345678901234567890123456789012345678901234
+    expiration: 86400000
   rabbit:
     exchange: envios.exchange
     queue: envios.queue

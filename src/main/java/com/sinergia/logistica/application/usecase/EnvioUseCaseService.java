@@ -1,11 +1,10 @@
 package com.sinergia.logistica.application.usecase;
 
-import com.sinergia.logistica.application.dto.CrearEnvioMaritimoRequest;
-import com.sinergia.logistica.application.dto.CrearEnvioTerrestreRequest;
-import com.sinergia.logistica.application.dto.RespuestaEnvio;
+import com.sinergia.logistica.application.dto.*;
 import com.sinergia.logistica.domain.model.Envio;
-import com.sinergia.logistica.domain.port.in.CrearEnvioMaritimoUseCase;
-import com.sinergia.logistica.domain.port.in.CrearEnvioTerrestreUseCase;
+import com.sinergia.logistica.domain.model.TipoLogistica;
+import com.sinergia.logistica.domain.port.in.EnvioMaritimoUseCase;
+import com.sinergia.logistica.domain.port.in.EnvioTerrestreUseCase;
 import com.sinergia.logistica.domain.port.in.ObtenerEnviosUseCase;
 import com.sinergia.logistica.domain.port.out.EnvioRepositoryPort;
 import com.sinergia.logistica.domain.port.out.PublicadorEventoEnvioPort;
@@ -15,9 +14,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
-public class EnvioUseCaseService implements CrearEnvioTerrestreUseCase, CrearEnvioMaritimoUseCase, ObtenerEnviosUseCase {
+public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimoUseCase, ObtenerEnviosUseCase {
 
     private final EnvioRepositoryPort envioRepositoryPort;
     private final PublicadorEventoEnvioPort publicadorEventoEnvioPort;
@@ -92,6 +92,74 @@ public class EnvioUseCaseService implements CrearEnvioTerrestreUseCase, CrearEnv
     }
 
     @Override
+    public Mono<RespuestaEnvio> buscarPorId(UUID id) {
+        return envioRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío no encontrado")))
+                .map(this::aRespuesta);
+    }
+
+    @Override
+    public Mono<RespuestaEnvio> actualizar(UUID id, ActualizarEnvioMaritimoRequest request) {
+        return envioRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío marítimo no encontrado")))
+                .flatMap(actual -> {
+                    if (actual.getTipoLogistica() != TipoLogistica.MARITIMA) {
+                        return Mono.error(new IllegalArgumentException("El envío no es marítimo"));
+                    }
+
+                    BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoMaritimo(request.cantidad());
+                    BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(request.precioEnvio(), descuento);
+
+                    actual.actualizarMaritimo(
+                            request.tipoProducto(),
+                            request.cantidad(),
+                            request.fechaEntrega(),
+                            request.precioEnvio(),
+                            request.nombrePuerto(),
+                            request.numeroFlota(),
+                            descuento,
+                            precioFinal
+                    );
+
+                    return envioRepositoryPort.save(actual).map(this::aRespuesta);
+                });
+    }
+
+    @Override
+    public Mono<RespuestaEnvio> actualizar(UUID id, ActualizarEnvioTerrestreRequest request) {
+        return envioRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío terrestre no encontrado")))
+                .flatMap(actual -> {
+                    if (actual.getTipoLogistica() != TipoLogistica.TERRESTRE) {
+                        return Mono.error(new IllegalArgumentException("El envío no es terrestre"));
+                    }
+
+                    BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoTerrestre(request.cantidad());
+                    BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(request.precioEnvio(), descuento);
+
+                    actual.actualizarTerrestre(
+                            request.tipoProducto(),
+                            request.cantidad(),
+                            request.fechaEntrega(),
+                            request.precioEnvio(),
+                            request.nombreBodega(),
+                            request.placaVehiculo(),
+                            descuento,
+                            precioFinal
+                    );
+
+                    return envioRepositoryPort.save(actual).map(this::aRespuesta);
+                });
+    }
+
+    @Override
+    public Mono<Void> eliminar(UUID id) {
+        return envioRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío no encontrado")))
+                .flatMap(envio -> envioRepositoryPort.deleteById(id));
+    }
+
+    @Override
     public Flux<RespuestaEnvio> findAll() {
         return envioRepositoryPort.findAll()
                 .map(this::aRespuesta);
@@ -117,5 +185,6 @@ public class EnvioUseCaseService implements CrearEnvioTerrestreUseCase, CrearEnv
                 envio.getNumeroFlota()
         );
     }
+
 
 }

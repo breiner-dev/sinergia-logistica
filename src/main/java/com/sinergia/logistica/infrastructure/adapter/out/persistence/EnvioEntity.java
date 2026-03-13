@@ -3,6 +3,8 @@ package com.sinergia.logistica.infrastructure.adapter.out.persistence;
 import com.sinergia.logistica.domain.model.EstadoEnvio;
 import com.sinergia.logistica.domain.model.TipoLogistica;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Table("envios")
-public class EnvioEntity {
+public class EnvioEntity implements Persistable<UUID> {
 
     @Id
     private UUID id;
@@ -31,7 +33,11 @@ public class EnvioEntity {
     private String nombrePuerto;
     private String numeroFlota;
 
+    @Transient
+    private boolean isNew;
+
     public EnvioEntity() {
+        this.isNew = false;
     }
 
     public EnvioEntity(
@@ -68,10 +74,17 @@ public class EnvioEntity {
         this.placaVehiculo = placaVehiculo;
         this.nombrePuerto = nombrePuerto;
         this.numeroFlota = numeroFlota;
+        this.isNew = true;
     }
 
+    @Override
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 
     public String getNumeroGuia() {

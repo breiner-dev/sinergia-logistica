@@ -129,6 +129,58 @@ public class Envio {
         );
     }
 
+    public void actualizarTerrestre(
+            String tipoProducto,
+            Integer cantidad,
+            LocalDate fechaEntrega,
+            BigDecimal precioEnvio,
+            String nombreBodega,
+            String placaVehiculo,
+            BigDecimal porcentajeDescuento,
+            BigDecimal precioConDescuento
+    ) {
+
+        if (this.tipoLogistica != TipoLogistica.TERRESTRE) {
+            throw new IllegalStateException("El envío no es de tipo terrestre");
+        }
+
+        this.tipoProducto = tipoProducto;
+        this.cantidad = cantidad;
+        this.fechaEntrega = fechaEntrega;
+        this.precioEnvio = precioEnvio;
+        this.nombreBodega = nombreBodega;
+        this.placaVehiculo = placaVehiculo;
+
+        this.porcentajeDescuento = porcentajeDescuento;
+        this.precioConDescuento = precioConDescuento;
+    }
+
+    public void actualizarMaritimo(
+            String tipoProducto,
+            Integer cantidad,
+            LocalDate fechaEntrega,
+            BigDecimal precioEnvio,
+            String nombrePuerto,
+            String numeroFlota,
+            BigDecimal porcentajeDescuento,
+            BigDecimal precioConDescuento
+    ) {
+
+        if (this.tipoLogistica != TipoLogistica.MARITIMA) {
+            throw new IllegalStateException("El envío no es de tipo marítimo");
+        }
+
+        this.tipoProducto = tipoProducto;
+        this.cantidad = cantidad;
+        this.fechaEntrega = fechaEntrega;
+        this.precioEnvio = precioEnvio;
+        this.nombrePuerto = nombrePuerto;
+        this.numeroFlota = numeroFlota;
+
+        this.porcentajeDescuento = porcentajeDescuento;
+        this.precioConDescuento = precioConDescuento;
+    }
+
     public UUID getId() {
         return id;
     }

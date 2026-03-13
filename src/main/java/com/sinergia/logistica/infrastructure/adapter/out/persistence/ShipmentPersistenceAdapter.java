@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 public class ShipmentPersistenceAdapter implements EnvioRepositoryPort {
 
@@ -21,13 +23,7 @@ public class ShipmentPersistenceAdapter implements EnvioRepositoryPort {
     @Override
     public Mono<Envio> save(Envio envio) {
         return repository.save(EnvioMapper.toEntity(envio))
-                .doOnSubscribe(sub -> System.out.println("Guardando envío..."))
-                .doOnNext(entity -> System.out.println("Guardado en BD: " + entity))
-                .doOnError(error -> System.out.println("Error al guardar: " + error.getMessage()))
-                .map(entity -> {
-                    Envio envioGuardado = EnvioMapper.toDomain(entity); // breakpoint aquí
-                    return envioGuardado;
-                });
+                .map(EnvioMapper::toDomain);
     }
 
     @Override
@@ -39,5 +35,16 @@ public class ShipmentPersistenceAdapter implements EnvioRepositoryPort {
     public Flux<Envio> findAll() {
         return repository.findAll()
                 .map(EnvioMapper::toDomain);
+    }
+
+    @Override
+    public Mono<Envio> findById(UUID id) {
+        return repository.findById(id)
+                .map(EnvioMapper::toDomain);
+    }
+
+    @Override
+    public Mono<Void> deleteById(UUID id) {
+        return repository.deleteById(id);
     }
 }
