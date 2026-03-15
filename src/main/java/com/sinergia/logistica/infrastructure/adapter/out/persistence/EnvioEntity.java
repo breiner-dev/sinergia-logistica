@@ -87,64 +87,132 @@ public class EnvioEntity implements Persistable<UUID> {
         return isNew;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public String getNumeroGuia() {
         return numeroGuia;
+    }
+
+    public void setNumeroGuia(String numeroGuia) {
+        this.numeroGuia = numeroGuia;
     }
 
     public UUID getClienteId() {
         return clienteId;
     }
 
+    public void setClienteId(UUID clienteId) {
+        this.clienteId = clienteId;
+    }
+
     public String getTipoProducto() {
         return tipoProducto;
+    }
+
+    public void setTipoProducto(String tipoProducto) {
+        this.tipoProducto = tipoProducto;
     }
 
     public Integer getCantidad() {
         return cantidad;
     }
 
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
     public LocalDateTime getFechaRegistro() {
         return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
     public LocalDate getFechaEntrega() {
         return fechaEntrega;
     }
 
+    public void setFechaEntrega(LocalDate fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
+    }
+
     public BigDecimal getPrecioEnvio() {
         return precioEnvio;
+    }
+
+    public void setPrecioEnvio(BigDecimal precioEnvio) {
+        this.precioEnvio = precioEnvio;
     }
 
     public BigDecimal getPorcentajeDescuento() {
         return porcentajeDescuento;
     }
 
+    public void setPorcentajeDescuento(BigDecimal porcentajeDescuento) {
+        this.porcentajeDescuento = porcentajeDescuento;
+    }
+
     public BigDecimal getPrecioConDescuento() {
         return precioConDescuento;
+    }
+
+    public void setPrecioConDescuento(BigDecimal precioConDescuento) {
+        this.precioConDescuento = precioConDescuento;
     }
 
     public TipoLogistica getTipoLogistica() {
         return tipoLogistica;
     }
 
+    public void setTipoLogistica(TipoLogistica tipoLogistica) {
+        this.tipoLogistica = tipoLogistica;
+    }
+
     public EstadoEnvio getEstado() {
         return estado;
+    }
+
+    public void setEstado(EstadoEnvio estado) {
+        this.estado = estado;
     }
 
     public String getNombreBodega() {
         return nombreBodega;
     }
 
+    public void setNombreBodega(String nombreBodega) {
+        this.nombreBodega = nombreBodega;
+    }
+
     public String getPlacaVehiculo() {
         return placaVehiculo;
+    }
+
+    public void setPlacaVehiculo(String placaVehiculo) {
+        this.placaVehiculo = placaVehiculo;
     }
 
     public String getNombrePuerto() {
         return nombrePuerto;
     }
 
+    public void setNombrePuerto(String nombrePuerto) {
+        this.nombrePuerto = nombrePuerto;
+    }
+
     public String getNumeroFlota() {
         return numeroFlota;
+    }
+
+    public void setNumeroFlota(String numeroFlota) {
+        this.numeroFlota = numeroFlota;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 
     @Override

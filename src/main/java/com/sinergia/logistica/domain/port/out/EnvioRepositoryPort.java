@@ -17,4 +17,6 @@ public interface EnvioRepositoryPort {
 
     Mono<Void> deleteById(UUID id);
 
+    Mono<Envio> update(Envio envio);
+
 }

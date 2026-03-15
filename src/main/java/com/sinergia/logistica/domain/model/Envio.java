@@ -245,4 +245,67 @@ public class Envio {
         return numeroFlota;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setNumeroGuia(String numeroGuia) {
+        this.numeroGuia = numeroGuia;
+    }
+
+    public void setClienteId(UUID clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public void setTipoProducto(String tipoProducto) {
+        this.tipoProducto = tipoProducto;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public void setFechaEntrega(LocalDate fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
+    }
+
+    public void setPrecioEnvio(BigDecimal precioEnvio) {
+        this.precioEnvio = precioEnvio;
+    }
+
+    public void setPorcentajeDescuento(BigDecimal porcentajeDescuento) {
+        this.porcentajeDescuento = porcentajeDescuento;
+    }
+
+    public void setPrecioConDescuento(BigDecimal precioConDescuento) {
+        this.precioConDescuento = precioConDescuento;
+    }
+
+    public void setTipoLogistica(TipoLogistica tipoLogistica) {
+        this.tipoLogistica = tipoLogistica;
+    }
+
+    public void setEstado(EstadoEnvio estado) {
+        this.estado = estado;
+    }
+
+    public void setNombreBodega(String nombreBodega) {
+        this.nombreBodega = nombreBodega;
+    }
+
+    public void setPlacaVehiculo(String placaVehiculo) {
+        this.placaVehiculo = placaVehiculo;
+    }
+
+    public void setNombrePuerto(String nombrePuerto) {
+        this.nombrePuerto = nombrePuerto;
+    }
+
+    public void setNumeroFlota(String numeroFlota) {
+        this.numeroFlota = numeroFlota;
+    }
 }

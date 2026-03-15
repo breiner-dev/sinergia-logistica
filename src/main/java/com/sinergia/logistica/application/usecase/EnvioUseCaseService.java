@@ -225,10 +225,10 @@ public class EnvioUseCaseService implements EnviosUseCase {
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío no encontrado")))
                 .flatMap(envio -> {
                     if (envio.getTipoLogistica() == TipoLogistica.TERRESTRE) {
-                        BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoTerrestre(request.cantidad());
-                        BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(
-                                request.precioEnvio(), descuento
-                        );
+                        BigDecimal descuento = servicioDominioEnvio
+                                .calcularPorcentajeDescuentoTerrestre(request.cantidad());
+                        BigDecimal precioConDescuento = servicioDominioEnvio
+                                .calcularPrecioConDescuento(request.precioEnvio(), descuento);
 
                         envio.actualizarTerrestre(
                                 request.tipoProducto(),
@@ -238,13 +238,13 @@ public class EnvioUseCaseService implements EnviosUseCase {
                                 request.nombreBodega(),
                                 request.placaVehiculo(),
                                 descuento,
-                                precioFinal
+                                precioConDescuento
                         );
                     } else {
-                        BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoMaritimo(request.cantidad());
-                        BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(
-                                request.precioEnvio(), descuento
-                        );
+                        BigDecimal descuento = servicioDominioEnvio
+                                .calcularPorcentajeDescuentoMaritimo(request.cantidad());
+                        BigDecimal precioConDescuento = servicioDominioEnvio
+                                .calcularPrecioConDescuento(request.precioEnvio(), descuento);
 
                         envio.actualizarMaritimo(
                                 request.tipoProducto(),
@@ -254,11 +254,11 @@ public class EnvioUseCaseService implements EnviosUseCase {
                                 request.nombrePuerto(),
                                 request.numeroFlota(),
                                 descuento,
-                                precioFinal
+                                precioConDescuento
                         );
                     }
 
-                    return envioRepositoryPort.save(envio);
+                    return envioRepositoryPort.update(envio);
                 })
                 .map(this::aRespuesta);
     }

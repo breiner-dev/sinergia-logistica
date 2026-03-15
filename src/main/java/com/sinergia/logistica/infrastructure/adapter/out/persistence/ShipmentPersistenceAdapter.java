@@ -47,4 +47,30 @@ public class ShipmentPersistenceAdapter implements EnvioRepositoryPort {
     public Mono<Void> deleteById(UUID id) {
         return repository.deleteById(id);
     }
+
+    @Override
+    public Mono<Envio> update(Envio envio) {
+        return repository.findById(envio.getId())
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío no encontrado")))
+                .flatMap(entity -> {
+                    entity.setNumeroGuia(envio.getNumeroGuia());
+                    entity.setClienteId(envio.getClienteId());
+                    entity.setTipoProducto(envio.getTipoProducto());
+                    entity.setCantidad(envio.getCantidad());
+                    entity.setFechaRegistro(envio.getFechaRegistro());
+                    entity.setFechaEntrega(envio.getFechaEntrega());
+                    entity.setPrecioEnvio(envio.getPrecioEnvio());
+                    entity.setPorcentajeDescuento(envio.getPorcentajeDescuento());
+                    entity.setPrecioConDescuento(envio.getPrecioConDescuento());
+                    entity.setTipoLogistica(envio.getTipoLogistica());
+                    entity.setEstado(envio.getEstado());
+                    entity.setNombreBodega(envio.getNombreBodega());
+                    entity.setPlacaVehiculo(envio.getPlacaVehiculo());
+                    entity.setNombrePuerto(envio.getNombrePuerto());
+                    entity.setNumeroFlota(envio.getNumeroFlota());
+
+                    return repository.save(entity);
+                })
+                .map(EnvioMapper::toDomain);
+    }
 }
