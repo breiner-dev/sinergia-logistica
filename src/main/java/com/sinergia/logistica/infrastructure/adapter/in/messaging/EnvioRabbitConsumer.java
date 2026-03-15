@@ -15,5 +15,7 @@ public class EnvioRabbitConsumer {
         log.info("Evento consumido desde RabbitMQ. guia={}, tipo={}",
                 evento.numeroGuia(),
                 evento.tipoLogistica());
+
+        // Implementacioin despues de la creacion asociacion de comercio o envios de correo etc.
     }
 }

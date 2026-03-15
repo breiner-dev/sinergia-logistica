@@ -1,11 +1,11 @@
 package com.sinergia.logistica.application.usecase;
 
-import com.sinergia.logistica.application.dto.*;
+import com.sinergia.logistica.application.dto.ActualizarEnvioRequest;
+import com.sinergia.logistica.application.dto.CrearEnvioRequest;
+import com.sinergia.logistica.application.dto.RespuestaEnvio;
 import com.sinergia.logistica.domain.model.Envio;
 import com.sinergia.logistica.domain.model.TipoLogistica;
-import com.sinergia.logistica.domain.port.in.EnvioMaritimoUseCase;
-import com.sinergia.logistica.domain.port.in.EnvioTerrestreUseCase;
-import com.sinergia.logistica.domain.port.in.ObtenerEnviosUseCase;
+import com.sinergia.logistica.domain.port.in.EnviosUseCase;
 import com.sinergia.logistica.domain.port.out.EnvioRepositoryPort;
 import com.sinergia.logistica.domain.port.out.PublicadorEventoEnvioPort;
 import com.sinergia.logistica.domain.service.DominioEnvioService;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
-public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimoUseCase, ObtenerEnviosUseCase {
+public class EnvioUseCaseService implements EnviosUseCase {
 
     private final EnvioRepositoryPort envioRepositoryPort;
     private final PublicadorEventoEnvioPort publicadorEventoEnvioPort;
@@ -31,6 +31,73 @@ public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimo
         this.publicadorEventoEnvioPort = publicadorEventoEnvioPort;
     }
 
+    @Override
+    public Mono<RespuestaEnvio> create(CrearEnvioRequest request) {
+        return envioRepositoryPort.existsByGuideNumber(request.numeroGuia())
+                .flatMap(existe -> {
+                    if (existe) {
+                        return Mono.error(new IllegalArgumentException("La guía ya existe"));
+                    }
+
+                    Envio envio;
+                    BigDecimal descuento;
+
+                    if (request.tipoLogistica() == TipoLogistica.TERRESTRE) {
+                        descuento = servicioDominioEnvio
+                                .calcularPorcentajeDescuentoTerrestre(request.cantidad());
+
+                        BigDecimal precioConDescuento =
+                                servicioDominioEnvio.calcularPrecioConDescuento(
+                                        request.precioEnvio(),
+                                        descuento
+                                );
+
+                        envio = Envio.crearTerrestre(
+                                request.clienteId(),
+                                request.tipoProducto(),
+                                request.cantidad(),
+                                request.fechaEntrega(),
+                                request.precioEnvio(),
+                                request.nombreBodega(),
+                                request.placaVehiculo(),
+                                request.numeroGuia(),
+                                precioConDescuento,
+                                descuento
+                        );
+                    } else {
+                        descuento = servicioDominioEnvio
+                                .calcularPorcentajeDescuentoMaritimo(request.cantidad());
+
+                        BigDecimal precioConDescuento =
+                                servicioDominioEnvio.calcularPrecioConDescuento(
+                                        request.precioEnvio(),
+                                        descuento
+                                );
+
+                        envio = Envio.crearMaritimo(
+                                request.clienteId(),
+                                request.tipoProducto(),
+                                request.cantidad(),
+                                request.fechaEntrega(),
+                                request.precioEnvio(),
+                                request.nombrePuerto(),
+                                request.numeroFlota(),
+                                request.numeroGuia(),
+                                precioConDescuento,
+                                descuento
+                        );
+                    }
+
+                    return envioRepositoryPort.save(envio)
+                            .flatMap(guardado ->
+                                    publicadorEventoEnvioPort.crearPublicacion(guardado)
+                                            .thenReturn(guardado)
+                            )
+                            .map(this::aRespuesta);
+                });
+    }
+
+    /*
     @Override
     public Mono<RespuestaEnvio> create(CrearEnvioTerrestreRequest request) {
         return envioRepositoryPort.existsByGuideNumber(request.numeroGuia())
@@ -89,7 +156,7 @@ public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimo
                             .flatMap(guardado -> publicadorEventoEnvioPort.crearPublicacion(guardado).thenReturn(guardado))
                             .map(this::aRespuesta);
                 });
-    }
+    } */
 
     @Override
     public Mono<RespuestaEnvio> buscarPorId(UUID id) {
@@ -98,6 +165,7 @@ public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimo
                 .map(this::aRespuesta);
     }
 
+    /*
     @Override
     public Mono<RespuestaEnvio> actualizar(UUID id, ActualizarEnvioMaritimoRequest request) {
         return envioRepositoryPort.findById(id)
@@ -150,6 +218,49 @@ public class EnvioUseCaseService implements EnvioTerrestreUseCase, EnvioMaritimo
 
                     return envioRepositoryPort.save(actual).map(this::aRespuesta);
                 });
+    } */
+
+    public Mono<RespuestaEnvio> actualizar(UUID id, ActualizarEnvioRequest request) {
+        return envioRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Envío no encontrado")))
+                .flatMap(envio -> {
+                    if (envio.getTipoLogistica() == TipoLogistica.TERRESTRE) {
+                        BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoTerrestre(request.cantidad());
+                        BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(
+                                request.precioEnvio(), descuento
+                        );
+
+                        envio.actualizarTerrestre(
+                                request.tipoProducto(),
+                                request.cantidad(),
+                                request.fechaEntrega(),
+                                request.precioEnvio(),
+                                request.nombreBodega(),
+                                request.placaVehiculo(),
+                                descuento,
+                                precioFinal
+                        );
+                    } else {
+                        BigDecimal descuento = servicioDominioEnvio.calcularPorcentajeDescuentoMaritimo(request.cantidad());
+                        BigDecimal precioFinal = servicioDominioEnvio.calcularPrecioConDescuento(
+                                request.precioEnvio(), descuento
+                        );
+
+                        envio.actualizarMaritimo(
+                                request.tipoProducto(),
+                                request.cantidad(),
+                                request.fechaEntrega(),
+                                request.precioEnvio(),
+                                request.nombrePuerto(),
+                                request.numeroFlota(),
+                                descuento,
+                                precioFinal
+                        );
+                    }
+
+                    return envioRepositoryPort.save(envio);
+                })
+                .map(this::aRespuesta);
     }
 
     @Override
