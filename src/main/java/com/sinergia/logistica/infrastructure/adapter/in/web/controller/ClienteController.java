@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/cliente")
 public class ClienteController {
 
     private final ClienteUseCase clienteUseCase;
