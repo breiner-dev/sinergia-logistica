@@ -1,26 +1,24 @@
 package com.sinergia.logistica.infrastructure.adapter.in.web.controller;
 
-import com.sinergia.logistica.auth.dto.LoginRequest;
-import com.sinergia.logistica.auth.dto.LoginResponse;
-import com.sinergia.logistica.auth.service.AuthService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
+import com.sinergia.logistica.application.dto.ClienteResponse;
+import com.sinergia.logistica.domain.port.in.ClienteUseCase;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/auth")
 public class ClienteController {
 
-    private final ClienteService authService;
+    private final ClienteUseCase clienteUseCase;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+    public ClienteController(ClienteUseCase clienteUseCase) {
+        this.clienteUseCase = clienteUseCase;
     }
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    @GetMapping
+    public Flux<ClienteResponse> findAll() {
+        return clienteUseCase.listarTodos();
     }
 }

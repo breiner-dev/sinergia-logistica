@@ -1,6 +1,9 @@
 package com.sinergia.logistica.domain.port.in;
 
-public class ClienteUseCase {
+import com.sinergia.logistica.application.dto.ClienteResponse;
+import reactor.core.publisher.Flux;
 
-    public
+public interface ClienteUseCase {
+
+    public Flux<ClienteResponse> listarTodos();
 }
