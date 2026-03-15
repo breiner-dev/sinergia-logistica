@@ -11,7 +11,7 @@ import java.util.UUID;
 public record RespuestaEnvio(
         UUID id,
         String numeroGuia,
-        UUID clienteId,
+        ClienteResponse cliente,
         String tipoProducto,
         Integer cantidad,
         LocalDateTime fechaRegistro,
